@@ -1,1 +1,1 @@
-MemoryHack solution from BUGuvix team
+MemoryHack solution from BUGuvix team!
