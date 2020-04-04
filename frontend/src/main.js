@@ -5,6 +5,7 @@ import store from "src/store/store";
 import Vuetify from "vuetify";
 import "vuetify/dist/vuetify.min.css";
 import colors from "vuetify/es5/util/colors";
+import Notifications from 'vue-notification';
 
 Vue.use(Vuetify,{
   theme: {
@@ -13,6 +14,7 @@ Vue.use(Vuetify,{
     accent: colors[store.state.theme].accent1
   }
 });
+Vue.use(Notifications);
 
 new Vue({
   el: "#app",

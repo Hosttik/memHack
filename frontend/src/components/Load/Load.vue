@@ -19,6 +19,8 @@
 <script>
 
   import { apiHost } from 'src/api/api.utils';
+  import showNotify from 'src/helpers/showNotify';
+  import showErrors from 'src/helpers/showErrors';
 
   export default {
     name: 'Load',
@@ -53,18 +55,24 @@
       upload: async function () {
         let file = this.files.shift();
         const formData = new FormData();
-        formData.append('user_id', 1);
+        formData.append('user_id', localStorage.getItem('memHackUserId'));
         formData.append('file', file);
         try {
           const res = await apiHost.post('/upload-file', formData);
-          if (res.is_success) {
-              // вывести сообщение об успехе
-              this.$router.push({ path: 'filters' })
+          if (res.data.is_success) {
+            showNotify({
+              text: 'Картинка успешно загружена',
+              type: 'success'
+            });
+            this.$router.push({path: 'filters'})
           } else {
-              // вывести ошибку
+            showErrors(res && res.data && res.data.errors);
           }
         } catch (e) {
-            // вывести ошибку нашу на фронте "Ошибка загрузки файла"
+          showNotify({
+            text: 'Ошибка загрузки файла',
+            type: 'error'
+          })
         }
       },
     }

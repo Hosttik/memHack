@@ -1,6 +1,7 @@
 <template>
     <div id="app">
         <v-app>
+            <notifications group="main"></notifications>
             <v-toolbar dark tabs flat color="primary">
                 <v-spacer></v-spacer>
 
@@ -39,18 +40,15 @@
 </template>
 
 <script>
-  import { apiHost } from 'src/api/api.utils';
-  import qs from 'qs';
+  import Vue from 'vue';
 
   export default {
     name: 'App',
-    created: async function () {
-      // try {
-      //   const res = await apiHost.post('/upload-file', qs.stringify({test: 123}));
-      //   console.log(res);
-      // } catch (e) {
-      //   console.log(e);
-      // }
+    beforeCreate: async function () {
+      const userId = localStorage.getItem('memHackUserId');
+      if (!userId) {
+        localStorage.setItem('memHackUserId', 1);
+      }
     },
     data() {
       return {};
