@@ -40,6 +40,7 @@
   import { apiHost } from 'src/api/api.utils';
   import showNotify from 'src/helpers/showNotify';
   import showErrors from 'src/helpers/showErrors';
+  import getUrl from 'src/helpers/getUrl';
 
   export default {
     name: 'Filters',
@@ -47,11 +48,11 @@
       const params = {'user_id': localStorage.getItem('memHackUserId')};
       try {
         const res = await apiHost.get('/get-original-file', params);
-        const isSuccess = res.data.is_success;
+        const isSuccess = res.is_success;
         if (!isSuccess) {
-          return showErrors(res && res.data && res.data.errors);
+          return showErrors(res && res.errors);
         }
-        const img = res.data.content;
+        const img = getUrl(res.content.file_path);
         this.originImgPath = img;
         this.resultImgPath = img;
       } catch (e) {
@@ -61,12 +62,12 @@
         })
       }
       try {
-        const res = await apiHost.get('/use-filters', params);
-        const isSuccess = res.data.is_success;
+        const res = await apiHost.get('/get-preview-filters', params);
+        const isSuccess = res.is_success;
         if (!isSuccess) {
-          return showErrors(res && res.data && res.data.errors);
+          return showErrors(res  && res.errors);
         }
-        this.filters = res.data.content.map(filter => {
+        this.filters = res.content.map(filter => {
           filter.activate = false;
           return filter
         });
@@ -76,6 +77,7 @@
           type: 'error'
         })
       }
+
     },
     data() {
       return {
@@ -138,7 +140,7 @@
           this.loader = true;
           const filters = this.filters.filter(filter => filter.activate).map(filter => filter.id).join('&');
           try {
-            const res = await apiHost.get(`/get-filtered-file?${filters}`);
+            const res = await apiHost.get(`/use-filters?${filters}`);
             const isSuccess = res.data.is_success;
             if (!isSuccess) {
               this.loader = false;

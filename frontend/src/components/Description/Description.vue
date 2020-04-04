@@ -57,6 +57,7 @@
     import { apiHost } from 'src/api/api.utils';
     import showNotify from 'src/helpers/showNotify';
     import showErrors from 'src/helpers/showErrors';
+    import getUrl from 'src/helpers/getUrl';
 
     export default {
         name: "Description",
@@ -64,12 +65,11 @@
             const params = {'user_id': localStorage.getItem('memHackUserId')};
             try {
                 const res = await apiHost.get('/get-original-file', params);
-                const isSuccess = res.data.is_success;
+                const isSuccess = res.is_success;
                 if (!isSuccess) {
-                    return showErrors(res && res.data && res.data.errors);
+                    return showErrors(res && res.errors);
                 }
-                const img = res.data.content;
-                this.originImgPath = img;
+                this.originImgPath = getUrl(res.content.file_path);
             } catch (e) {
                 showNotify({
                     text: 'Произошла ошибка',

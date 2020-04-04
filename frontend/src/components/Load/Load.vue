@@ -59,14 +59,14 @@
         formData.append('file', file);
         try {
           const res = await apiHost.post('/upload-file', formData);
-          if (res.data.is_success) {
+          if (res.is_success) {
             showNotify({
               text: 'Картинка успешно загружена',
               type: 'success'
             });
             this.$router.push({path: 'description'})
           } else {
-            showErrors(res && res.data && res.data.errors);
+            showErrors(res && res.errors);
           }
         } catch (e) {
           showNotify({
@@ -81,8 +81,8 @@
 
 <style scoped>
     .dropArea {
-        background-color: lightblue;
-        border: 2px solid darkgray;
+        background-color: #e8ebec;;
+        border: 2px dashed #5c6ac0;
         min-height: 400px;
     }
 </style>
