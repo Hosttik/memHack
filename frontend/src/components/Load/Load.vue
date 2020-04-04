@@ -2,8 +2,8 @@
     <div v-cloak @drop.prevent="addFile" @dragover.prevent class="dropArea">
         <h2>Перетащите файл</h2>
         <div>
-            Поддерживаемый формат файла: jpg, jpeg, png.
-            Максимальный размер изображения 5 Mb.
+            <p>Поддерживаемый формат файла: jpg, jpeg, png.</p>
+            <p>Максимальный размер изображения 5 Mb.</p>
         </div>
         <ul>
             <li v-for="file in files">
@@ -57,9 +57,14 @@
         formData.append('file', file);
         try {
           const res = await apiHost.post('/upload-file', formData);
-          console.log(res);
+          if (res.is_success) {
+              // вывести сообщение об успехе
+              this.$router.push({ path: 'filters' })
+          } else {
+              // вывести ошибку
+          }
         } catch (e) {
-          console.log(e);
+            // вывести ошибку нашу на фронте "Ошибка загрузки файла"
         }
       },
     }
