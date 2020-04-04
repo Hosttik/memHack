@@ -20,10 +20,29 @@
                 <div class="photo-wrap">
                     <div class="origin-photo">
                         <div class="img-text">Оригинал</div>
-                        <img :src="originImgPath" class="img-photo"/></div>
+                        <img :src="originImgPath" v-if="originImgPath" class="img-photo"/>
+                        <v-progress-circular
+                                v-if="!originImgPath"
+                                :size="70"
+                                :width="7"
+                                color="purple"
+                                indeterminate
+                                class="spinner"
+                        ></v-progress-circular>
+                    </div>
+
                     <div class="future-photo">
                         <div class="img-text">Результат</div>
-                        <img :src="originImgPath" class="img-photo"/></div>
+                        <img :src="resultImgPath" v-if="originImgPath" class="img-photo"/>
+                        <v-progress-circular
+                                v-if="!resultImgPath"
+                                :size="70"
+                                :width="7"
+                                color="purple"
+                                indeterminate
+                                class="spinner"
+                        ></v-progress-circular>
+                    </div>
                 </div>
                 <v-btn outline
                        class="ma-2"
@@ -41,7 +60,7 @@
   import showNotify from 'src/helpers/showNotify';
   import showErrors from 'src/helpers/showErrors';
   import getUrl from 'src/helpers/getUrl';
-  import { mapMutations } from "vuex";
+  import { mapMutations } from 'vuex';
 
   export default {
     name: 'Filters',
@@ -129,7 +148,7 @@
       };
     },
     methods: {
-      ...mapMutations(["changeLoaderStatus"]),
+      ...mapMutations(['changeLoaderStatus']),
       filterChange: async function () {
         if (this.$store.state.loader) {
           return;
@@ -183,6 +202,10 @@
         position: relative;
         width: 460px;
         height: 480px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: grey;
     }
 
     .future-photo {
@@ -191,6 +214,10 @@
         position: relative;
         width: 460px;
         height: 480px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: grey;
     }
 
     .img-photo {

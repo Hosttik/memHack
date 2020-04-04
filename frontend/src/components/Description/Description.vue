@@ -6,7 +6,15 @@
                 <v-card class="full-height">
                     <div class="photo-wrap d-inline-block">
                         <div class="origin-photo">
-                            <img :src="originImgPath" class="img-photo"/>
+                            <img :src="originImgPath" v-if="originImgPath" class="img-photo"/>
+                            <v-progress-circular
+                                    v-if="!originImgPath"
+                                    :size="70"
+                                    :width="7"
+                                    color="purple"
+                                    indeterminate
+                                    class="spinner"
+                            ></v-progress-circular>
                         </div>
                     </div>
                     <div class="d-inline-block form_data">
@@ -117,7 +125,7 @@
     }
 
     .photo-wrap {
-        padding: 20px 0;
+        padding: 10px;
         width: 50%;
         height: 100%;
         float: left;
@@ -127,9 +135,12 @@
     .origin-photo {
         float: left;
         position: relative;
-        padding: 15px;
         width: 600px;
         height: 530px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: grey;
     }
 
     .form_data {
