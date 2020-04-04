@@ -56,7 +56,7 @@
     beforeCreate: async function () {
       const userId = localStorage.getItem('memHackUserId');
       if (!userId) {
-        localStorage.setItem('memHackUserId', 1);
+        localStorage.setItem('memHackUserId', 2);
       }
     },
     data() {
