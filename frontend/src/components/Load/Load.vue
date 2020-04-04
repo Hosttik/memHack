@@ -2,6 +2,18 @@
     <div v-cloak @drop.prevent="addFile" @dragover.prevent class="dropArea">
         <div>
             <h2>Перетащите файл</h2>
+            <v-radio-group v-model="nextPath" column>
+                <v-radio
+                        label="Загрузка фотографии для применении фильтров"
+                        color="indigo"
+                        value="description"
+                ></v-radio>
+                <v-radio
+                        label="Загрузка фотографии для поиска медалей на фото"
+                        color="indigo"
+                        value="medals"
+                ></v-radio>
+            </v-radio-group>
             <div>
                 <p>Поддерживаемый формат файла: jpg, jpeg, png.</p>
                 <p>Максимальный размер изображения 5 Mb.</p>
@@ -23,11 +35,13 @@
   import { apiHost } from 'src/api/api.utils';
   import showNotify from 'src/helpers/showNotify';
   import showErrors from 'src/helpers/showErrors';
+  import { mapMutations } from "vuex";
 
   export default {
     name: 'Load',
     data() {
       return {
+        nextPath: 'description',
         files: [],
       };
     },
@@ -37,6 +51,7 @@
       }
     },
     methods: {
+      ...mapMutations(["changeLoaderStatus"]),
       addFile(e) {
         if (this.files.length === 1) {
           return;
@@ -55,6 +70,7 @@
         });
       },
       upload: async function () {
+        this.changeLoaderStatus(true);
         let file = this.files.shift();
         const formData = new FormData();
         formData.append('user_id', localStorage.getItem('memHackUserId'));
@@ -62,15 +78,18 @@
         try {
           const res = await apiHost.post('/upload-file', formData);
           if (res.is_success) {
+            this.changeLoaderStatus(false);
             showNotify({
               text: 'Картинка успешно загружена',
               type: 'success'
             });
-            this.$router.push({path: 'description'})
+            this.$router.push({path: this.nextPath})
           } else {
+            this.changeLoaderStatus(false);
             showErrors(res && res.errors);
           }
         } catch (e) {
+          this.changeLoaderStatus(false);
           showNotify({
             text: 'Ошибка загрузки файла',
             type: 'error'
