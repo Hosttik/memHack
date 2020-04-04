@@ -165,7 +165,7 @@
 
 <style scoped>
     .full-height {
-        height: 720px;
+        height: 100%;
     }
 
     .photo-wrap {
@@ -178,24 +178,26 @@
 
 
     .origin-photo {
-        width: 50%;
         padding: 15px;
         float: left;
         position: relative;
+        width: 460px;
+        height: 480px;
     }
 
     .future-photo {
-        width: 50%;
         padding: 15px;
         float: right;
         position: relative;
+        width: 460px;
+        height: 480px;
     }
 
     .img-photo {
         background: grey;
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
     }
 
     .img-text {

@@ -128,6 +128,8 @@
         float: left;
         position: relative;
         padding: 15px;
+        width: 600px;
+        height: 530px;
     }
 
     .form_data {
@@ -139,6 +141,6 @@
         background: grey;
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
     }
 </style>
