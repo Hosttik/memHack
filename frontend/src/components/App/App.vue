@@ -45,12 +45,12 @@
   export default {
     name: 'App',
     created: async function () {
-      try {
-        const res = await apiHost.post('/upload-file', qs.stringify({test: 123}));
-        console.log(res);
-      } catch (e) {
-        console.log(e);
-      }
+      // try {
+      //   const res = await apiHost.post('/upload-file', qs.stringify({test: 123}));
+      //   console.log(res);
+      // } catch (e) {
+      //   console.log(e);
+      // }
     },
     data() {
       return {};
