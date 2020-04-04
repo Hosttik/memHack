@@ -1,13 +1,17 @@
 <template>
-    <div v-cloak @drop.prevent="addFile" @dragover.prevent>
-        <h2>Files to Upload (Drag them over)</h2>
+    <div v-cloak @drop.prevent="addFile" @dragover.prevent class="dropArea">
+        <h2>Перетащите файл</h2>
+        <div>
+            Поддерживаемый формат файла: jpg, jpeg, png.
+            Максимальный размер изображения 5 Mb.
+        </div>
         <ul>
             <li v-for="file in files">
                 {{ file.name }} ({{ file.size | kb }} kb) <button @click="removeFile(file)" title="Remove">X</button>
             </li>
         </ul>
 
-        <button :disabled="uploadDisabled" @click="upload">Upload</button>
+        <v-btn :disabled="uploadDisabled" @click="upload">Загрузить файл</v-btn>
     </div>
 </template>
 
@@ -57,10 +61,15 @@ export default {
                 .catch(e => {
                     console.error(JSON.stringify(e.message));
                 });
-
         }
     }
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+    .dropArea {
+        background-color: lightblue;
+        border: 2px solid darkgray;
+        min-height: 400px;
+    }
+</style>
