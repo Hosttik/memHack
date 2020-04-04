@@ -197,10 +197,9 @@
 
 
     .origin-photo {
-        padding: 15px;
         float: left;
         position: relative;
-        width: 460px;
+        width: 450px;
         height: 480px;
         display: flex;
         justify-content: center;
@@ -209,10 +208,9 @@
     }
 
     .future-photo {
-        padding: 15px;
         float: right;
         position: relative;
-        width: 460px;
+        width: 450px;
         height: 480px;
         display: flex;
         justify-content: center;

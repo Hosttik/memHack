@@ -49,14 +49,14 @@
 </template>
 
 <script>
-  import Vue from 'vue';
+  import { v4 as uuidv4 } from 'uuid';
 
   export default {
     name: 'App',
     beforeCreate: async function () {
       const userId = localStorage.getItem('memHackUserId');
       if (!userId) {
-        localStorage.setItem('memHackUserId', 2);
+        localStorage.setItem('memHackUserId', uuidv4());
       }
     },
     data() {
