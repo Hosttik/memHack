@@ -44,7 +44,7 @@
     async beforeCreate() {
       const params = {'user_id': localStorage.getItem('memHackUserId')};
       try {
-        const res = await apiHost.get('/get-original-file', params);
+        const res = await apiHost.get('/get-filtered-file ', params);
         const isSuccess = res.data.is_success;
         if (!isSuccess) {
           return showErrors(res && res.data && res.data.errors);
