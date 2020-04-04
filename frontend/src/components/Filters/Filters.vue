@@ -2,15 +2,15 @@
     <v-layout row>
         <v-flex class="full-height" xs3>
             <v-card class="full-height filters"><h1>Фильтры</h1>
-                <v-list two-line>
+                <v-list>
                     <template v-for="filter in filters">
-                        <v-list-item
-                                :key="filter.id"
-                                ripple
-                                @click=""
-                        >
-                            
-                        </v-list-item>
+                        <div :key="filter.id">
+                            <v-list-tile>
+                                <v-switch @change="filterChange" v-model="filter.activate" inset
+                                          :label="filter.name"></v-switch>
+                            </v-list-tile>
+                            <img :src="filter.path"/>
+                        </div>
                     </template>
                 </v-list>
             </v-card>
@@ -28,6 +28,7 @@
                 <v-btn outline
                        class="ma-2"
                        color="indigo"
+                       :to="'/finish'"
                 >Далее
                 </v-btn>
             </v-card>
@@ -60,12 +61,15 @@
         })
       }
       try {
-        const res = await apiHost.post('/get-preview-filters', params);
+        const res = await apiHost.get('/use-filters', params);
         const isSuccess = res.data.is_success;
         if (!isSuccess) {
           return showErrors(res && res.data && res.data.errors);
         }
-        this.filters = res.data.content;
+        this.filters = res.data.content.map(filter => {
+          filter.activate = false;
+          return filter
+        });
       } catch (e) {
         showNotify({
           text: 'Произошла ошибка',
@@ -77,41 +81,81 @@
       return {
         originImgPath: '',
         resultImgPath: '',
+        timerId: null,
+        loader: false,
         filters: [{
           id: 'filter1',
+          activate: false,
           name: 'Фильтр первый йопта',
           path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
         }, {
           id: 'filter2',
+          activate: false,
           name: 'Фильтр второй йопта',
           path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
         }, {
           id: 'filter3',
+          activate: false,
           name: 'Фильтр третий йопта',
           path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
         }, {
           id: 'filter4',
+          activate: false,
           name: 'Фильтр четвертый йопта',
           path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
         }, {
           id: 'filter5',
+          activate: false,
           name: 'Фильтр пятый йопта',
           path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
         }, {
           id: 'filter6',
+          activate: false,
           name: 'Фильтр шестой йопта',
           path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
         }, {
           id: 'filter7',
+          activate: false,
           name: 'Фильтр седьмой йопта',
           path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
         }, {
           id: 'filter8',
+          activate: false,
           name: 'Фильтр восьмой йопта',
           path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
         },]
       };
     },
+    methods: {
+      filterChange: async function () {
+        if (this.loader) {
+          return;
+        }
+        if (this.timerId) {
+          clearTimeout(this.timerId);
+        }
+        this.timerId = setTimeout(async () => {
+          this.loader = true;
+          const filters = this.filters.filter(filter => filter.activate).map(filter => filter.id).join('&');
+          try {
+            const res = await apiHost.get(`/get-filtered-file?${filters}`);
+            const isSuccess = res.data.is_success;
+            if (!isSuccess) {
+              this.loader = false;
+              return showErrors(res && res.data && res.data.errors);
+            }
+
+            this.resultImgPath = res.data.content;
+          } catch (e) {
+            this.loader = false;
+            showNotify({
+              text: 'Произошла ошибка',
+              type: 'error'
+            })
+          }
+        }, 1000);
+      }
+    }
   }
 </script>
 
