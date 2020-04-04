@@ -1,9 +1,21 @@
 <template>
-    <v-layout class="full-height" row>
-        <v-flex class="full-height" xs2>
-            <v-card class="full-height">Фильтры</v-card>
+    <v-layout row>
+        <v-flex class="full-height" xs3>
+            <v-card class="full-height filters"><h1>Фильтры</h1>
+                <v-list two-line>
+                    <template v-for="filter in filters">
+                        <v-list-item
+                                :key="filter.id"
+                                ripple
+                                @click=""
+                        >
+                            
+                        </v-list-item>
+                    </template>
+                </v-list>
+            </v-card>
         </v-flex>
-        <v-flex xs10>
+        <v-flex xs9>
             <v-card class="full-height">
                 <div class="photo-wrap">
                     <div class="origin-photo">
@@ -13,13 +25,11 @@
                         <div class="img-text">Результат</div>
                         <img :src="originImgPath" class="img-photo"/></div>
                 </div>
-                <div class="next-button-wrap">
-                    <v-btn outline
-                           class="ma-2"
-                           color="indigo"
-                    >Далее
-                    </v-btn>
-                </div>
+                <v-btn outline
+                       class="ma-2"
+                       color="indigo"
+                >Далее
+                </v-btn>
             </v-card>
         </v-flex>
     </v-layout>
@@ -67,7 +77,39 @@
       return {
         originImgPath: '',
         resultImgPath: '',
-        filters: {}
+        filters: [{
+          id: 'filter1',
+          name: 'Фильтр первый йопта',
+          path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
+        }, {
+          id: 'filter2',
+          name: 'Фильтр второй йопта',
+          path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
+        }, {
+          id: 'filter3',
+          name: 'Фильтр третий йопта',
+          path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
+        }, {
+          id: 'filter4',
+          name: 'Фильтр четвертый йопта',
+          path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
+        }, {
+          id: 'filter5',
+          name: 'Фильтр пятый йопта',
+          path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
+        }, {
+          id: 'filter6',
+          name: 'Фильтр шестой йопта',
+          path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
+        }, {
+          id: 'filter7',
+          name: 'Фильтр седьмой йопта',
+          path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
+        }, {
+          id: 'filter8',
+          name: 'Фильтр восьмой йопта',
+          path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
+        },]
       };
     },
   }
@@ -75,21 +117,17 @@
 
 <style scoped>
     .full-height {
-        height: 100%;
+        height: 720px;
     }
 
     .photo-wrap {
-        width: 80%;
-        display: inline-flex;
-        height: 100%;
+        padding-top: 50px;
+        width: 100%;
+        display: block;
+        height: 90%;
+        vertical-align: middle;
     }
 
-    .next-button-wrap {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-    }
 
     .origin-photo {
         width: 50%;
@@ -107,9 +145,8 @@
 
     .img-photo {
         background: grey;
-        width: 80%;
-        height: 90%;
-        vertical-align: middle;
+        width: 70%;
+        height: 100%;
     }
 
     .img-text {
@@ -117,6 +154,10 @@
         top: -20px;
         left: 0;
         right: 0;
+    }
+
+    .filters {
+        overflow: scroll;
     }
 
 </style>

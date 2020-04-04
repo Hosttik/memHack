@@ -19,7 +19,7 @@
                 <v-spacer></v-spacer>
             </v-toolbar>
             <v-content>
-                <v-container class="full-height" fluid grid-list-md text-xs-center>
+                <v-container fluid grid-list-md text-xs-center>
                     <router-view></router-view>
                 </v-container>
             </v-content>
