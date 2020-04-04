@@ -7,7 +7,8 @@
         </div>
         <ul>
             <li v-for="file in files">
-                {{ file.name }} ({{ file.size | kb }} kb) <button @click="removeFile(file)" title="Remove">X</button>
+                {{ file.name }} {{ file.size }}
+                <button @click="removeFile(file)" title="Remove">X</button>
             </li>
         </ul>
 
@@ -17,50 +18,55 @@
 
 <script>
 
-import { apiHost } from 'src/api/api.utils';
-import qs from 'qs';
+  import { apiHost } from 'src/api/api.utils';
+  import qs from 'qs';
 
-export default {
-    name: "Load",
+  export default {
+    name: 'Load',
     data() {
-        return {
-            files: [],
-        };
+      return {
+        files: [],
+      };
     },
     computed: {
-        uploadDisabled() {
-            return this.files.length !== 1;
-        }
+      uploadDisabled() {
+        return this.files.length !== 1;
+      }
     },
-    methods:{
-        addFile(e) {
-            if (this.files.length === 1) {
-                return;
-            }
-            let droppedFiles = e.dataTransfer.files;
-            if (!droppedFiles) {
-                return;
-            }
-            ([...droppedFiles]).forEach(f => {
-                this.files.push(f);
-            });
-        },
-        removeFile(file){
-            this.files = this.files.filter(f => {
-                return f != file;
-            });
-        },
-        upload: async function () {
-            let file = this.files.shift();
-            try {
-                const res = await apiHost.post('/upload-file', qs.stringify({user_id: 1, file: file}));
-                console.log(res);
-            } catch (e) {
-                console.log(e);
-            }
-        },
+    methods: {
+      addFile(e) {
+        if (this.files.length === 1) {
+          return;
+        }
+        let droppedFiles = e.dataTransfer.files;
+        if (!droppedFiles) {
+          return;
+        }
+        ([...droppedFiles]).forEach(f => {
+          this.files.push(f);
+        });
+      },
+      removeFile(file) {
+        this.files = this.files.filter(f => {
+          return f != file;
+        });
+      },
+      upload: async function () {
+        let file = this.files.shift();
+        try {
+          const res = await apiHost.post(
+            '/upload-file',
+            qs.stringify({
+              user_id: 1,
+              file: file
+            }));
+          console.log(res);
+        } catch (e) {
+          console.log(e);
+        }
+      },
     }
-};
+  };
 </script>
 
 <style scoped>
