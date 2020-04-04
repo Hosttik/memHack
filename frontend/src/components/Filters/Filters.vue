@@ -142,13 +142,13 @@
           const filters = this.filters.filter(filter => filter.activate).map(filter => filter.id).join('&');
           try {
             const res = await apiHost.get(`/use-filters?${filters}`);
-            const isSuccess = res.data.is_success;
+            const isSuccess = res.is_success;
             if (!isSuccess) {
               this.changeLoaderStatus(false);
-              return showErrors(res && res.data && res.data.errors);
+              return showErrors(res.errors);
             }
 
-            this.resultImgPath = res.data.content;
+            this.resultImgPath = res.content;
           } catch (e) {
             this.changeLoaderStatus(false);
             showNotify({

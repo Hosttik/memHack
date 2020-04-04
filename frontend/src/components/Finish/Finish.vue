@@ -45,11 +45,11 @@
       const params = {'user_id': localStorage.getItem('memHackUserId')};
       try {
         const res = await apiHost.get('/get-filtered-file ', params);
-        const isSuccess = res.data.is_success;
+        const isSuccess = res.is_success;
         if (!isSuccess) {
-          return showErrors(res && res.data && res.data.errors);
+          return showErrors(res.errors);
         }
-        this.imgPath = res.data.content;
+        this.imgPath = res.content;
       } catch (e) {
         showNotify({
           text: 'Произошла ошибка',

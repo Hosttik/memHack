@@ -91,14 +91,14 @@
             upload: async function () {
                 try {
                     const res = await apiHost.get('/save-description', {...this.description, 'user_id': localStorage.getItem('memHackUserId')});
-                    if (res.data.is_success) {
+                    if (res.is_success) {
                         showNotify({
                             text: 'Данные успешно загружены',
                             type: 'success'
                         });
                         this.$router.push({path: 'filters'})
                     } else {
-                        showErrors(res && res.data && res.data.errors);
+                        showErrors(res.errors);
                     }
                 } catch (e) {
                     showNotify({
