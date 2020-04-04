@@ -19,7 +19,6 @@
 <script>
 
   import { apiHost } from 'src/api/api.utils';
-  import qs from 'qs';
 
   export default {
     name: 'Load',
@@ -53,13 +52,11 @@
       },
       upload: async function () {
         let file = this.files.shift();
+        const formData = new FormData();
+        formData.append('user_id', 1);
+        formData.append('file', file);
         try {
-          const res = await apiHost.post(
-            '/upload-file',
-            qs.stringify({
-              user_id: 1,
-              file: file
-            }));
+          const res = await apiHost.post('/upload-file', formData);
           console.log(res);
         } catch (e) {
           console.log(e);
