@@ -1,8 +1,9 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from 'src/components/Home/Home';
 import Account from 'src/components/Account/Account';
 import Filters from 'src/components/Filters/Filters';
+import Load from 'src/components/Load/Load';
+
 
 Vue.use(Router);
 
@@ -10,8 +11,8 @@ export default new Router({
   mode: 'history',
   routes: [{
     path: '/',
-    name: 'Главная',
-    component: Home
+    name: 'Загрузить фото',
+    component: Load
   }, {
     path: '/account',
     name: 'Личный кабинет',
@@ -21,4 +22,5 @@ export default new Router({
     name: 'Фильтры',
     component: Filters
   }]
+
 });
