@@ -9,6 +9,7 @@
                        class="ma-2"
                        :key="item.title"
                        :to="item.href"
+                       style=""
                        outlined>
                     <v-icon left>{{ item.icon }}</v-icon>
                     {{ item.title }}
@@ -17,7 +18,7 @@
                 <v-spacer></v-spacer>
             </v-toolbar>
             <v-content>
-                <v-container grid-list-md text-xs-center>
+                <v-container fluid grid-list-md text-xs-center>
                     <router-view></router-view>
                 </v-container>
             </v-content>
@@ -38,10 +39,17 @@
 </template>
 
 <script>
+  import { apiHost } from 'src/api/api.utils';
+
   export default {
     name: 'App',
-    created: function () {
-      console.log(this.$router.currentRoute)
+    created: async function () {
+      try {
+        const res = await apiHost.post('http://google.com', {});
+        console.log(res);
+      } catch (e) {
+        console.log(e);
+      }
     },
     data() {
       return {};

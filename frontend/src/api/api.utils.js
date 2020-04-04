@@ -1,11 +1,11 @@
 import axios from "axios";
-import { app } from "src/config/config";
+import config from "src/config/config";
 import { AXIOS_TIMEOUT } from "src/constants";
 
 const createNetworkAdapter = config => axios.create(config);
 
 const apiInstance = createNetworkAdapter({
-  baseURL: `${app.host}`,
+  baseURL: `${config.app.host}`,
   timeout: AXIOS_TIMEOUT
 });
 
