@@ -17,6 +17,8 @@
 
 <script>
 
+import { apiHost } from 'src/api/api.utils';
+
 export default {
     name: "Load",
     data() {
@@ -26,14 +28,18 @@ export default {
     },
     computed: {
         uploadDisabled() {
-            return this.files.length === 0;
+            return this.files.length !== 1;
         }
     },
     methods:{
         addFile(e) {
+            if (this.files.length === 1) {
+                return;
+            }
             let droppedFiles = e.dataTransfer.files;
-            if(!droppedFiles) return;
-            // this tip, convert FileList to array, credit: https://www.smashingmagazine.com/2018/01/drag-drop-file-uploader-vanilla-js/
+            if (!droppedFiles) {
+                return;
+            }
             ([...droppedFiles]).forEach(f => {
                 this.files.push(f);
             });
@@ -43,25 +49,15 @@ export default {
                 return f != file;
             });
         },
-        upload() {
-
-            let formData = new FormData();
-            this.files.forEach((f,x) => {
-                formData.append('file'+(x+1), f);
-            });
-
-            fetch('https://httpbin.org/post', {
-                method:'POST',
-                body: formData
-            })
-                .then(res => res.json())
-                .then(res => {
-                    console.log('done uploading', res);
-                })
-                .catch(e => {
-                    console.error(JSON.stringify(e.message));
-                });
-        }
+        upload: async function () {
+            let file = this.files.shift();
+            try {
+                const res = await apiHost.post('/upload-file', {user_id: 1, file: file});
+                console.log(res);
+            } catch (e) {
+                console.log(e);
+            }
+        },
     }
 };
 </script>
