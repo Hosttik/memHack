@@ -1,7 +1,8 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Load from "src/components/Load/Load";
-import Resources from "src/components/Resources/Resources";
+import Account from "src/components/Account/Account";
+
 
 Vue.use(Router);
 
@@ -14,9 +15,9 @@ export default new Router({
       component: Load
     },
     {
-      path: "/resources",
-      name: "Ресурсы",
-      component: Resources
+      path: "/account",
+      name: "Личный кабинет",
+      component: Account
     }
   ]
 });
