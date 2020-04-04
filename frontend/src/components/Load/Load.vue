@@ -64,7 +64,7 @@
               text: 'Картинка успешно загружена',
               type: 'success'
             });
-            this.$router.push({path: 'filters'})
+            this.$router.push({path: 'description'})
           } else {
             showErrors(res && res.data && res.data.errors);
           }
