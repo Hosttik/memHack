@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Account from 'src/components/Account/Account';
 import Filters from 'src/components/Filters/Filters';
 import Load from 'src/components/Load/Load';
+import Description from "src/components/Description/Description";
 
 
 Vue.use(Router);
@@ -21,6 +22,10 @@ export default new Router({
     path: '/filters',
     name: 'Фильтры',
     component: Filters
+  }, {
+    path: '/description',
+    name: 'Описание',
+    component: Description
   }]
 
 });
