@@ -65,10 +65,12 @@ def get_original_file():
     if user is None:
         answer = {'is_success': False, 'content': {}, 'errors': ["Can't load user data."]}
         return dumps(answer)
-    image_path = user.get_current_image().path
-    if image_path is None:
+    image = user.get_current_image()
+    if image is None:
         answer = {'is_success': False, 'content': {}, 'errors': ["There is now loaded images."]}
         return dumps(answer)
+
+    image_path = image.path
 
     serv_path = to_server_path(image_path)
     print(serv_path)
@@ -106,14 +108,41 @@ def get_preview_filters(self):
     return js_res
 
 
-@route('/save-description', method='POST')
+@route('/save-description', method='GET')
 @allow_cors
-def save_description(self):
-    print('Success!!!')
-    answer = {'result': 'Ok!'}
+def save_description():
+    user_id = request.query.user_id
+
+    print('save-description -> ID: ' + user_id)
+
+    fname = request.query.first_name
+    lname = request.query.last_name
+    mname = request.query.middle_name
+    rank = request.query.rank
+    info = request.query.info
+
+    descr = {"user_id" : user_id, "first_name" : fname, "last_name" : lname, "middle_name" : mname, "rank" : rank, "info": info}
+
+    answer = {}
+
+    user = get_user_data(user_id)
+    if user is None:
+        answer = {'is_success': False, 'content': {}, 'errors': ["Can't load user data."]}
+        return dumps(answer)
+
+    image = user.get_current_image()
+    if image is None:
+        answer = {'is_success': False, 'content': {}, 'errors': ["There is now loaded images."]}
+        return dumps(answer)
+
+    is_success = image.set_description(descr)
+
+    if not is_success:
+        answer = {'is_success': is_success, 'content': {}, 'errors': ["Can't save description."]}
+    else:
+        answer = {'is_success': is_success, 'content': {}, 'errors': []}
+
     return dumps(answer)
-    js_res = ''
-    return js_res
 
 
 @route('/static/<filepath:path>')

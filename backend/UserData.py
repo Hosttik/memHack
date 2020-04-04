@@ -61,10 +61,34 @@ class UserImageData:
         self.dir = dir
         entries = os.scandir(self.dir)
         for entry in entries:
-            if entry.is_file() and entry.name == 'description.json':
-                self.description_path = entry
+            if entry.is_file() and entry.name.endswith('.json'):
+                self.description_path = entry.path
             elif entry.is_file() and entry.path.endswith(('.jpg', '.png')):
                 self.path = entry.path
+                self.name = str(entry.name).split('.')[0]
+
+    def set_description(self, description):
+        if self.description_path is None:
+            if self.dir is not None and self.name is not None:
+                self.description_path = self.dir + '/' + self.name + '_description.json'
+            else:
+                print("Error: Image: Description: description path is empty")
+                return False
+
+        with open(self.description_path, 'w') as outfile:
+            json.dump(description, outfile)
+        # fd = os.open(self.description_path, os.O_RDWR | os.O_CREAT | os.O_TRUNC)
+        # if not os.path.exists(self.description_path):
+        #     os.close(fd)
+        #     print("Error: Image: Description: file not created")
+        #     return False
+        #
+        # print(description)
+        # os.write(fd, description)
+        #
+        # os.close(fd)
+        return True
+
 
 
 def get_user_data(user_id):
@@ -72,7 +96,8 @@ def get_user_data(user_id):
     if user_id not in entries:
         return None
     user = UserData()
-    user.load_user_data(os.path.normpath(os.path.abspath(global_working_directory + '/' + user_id)))
+    path = os.path.normpath(os.path.abspath(global_working_directory + '/' + user_id))
+    user.load_user_data(path)
     return user
 
 def upload_user_image(user_id, image_data):
