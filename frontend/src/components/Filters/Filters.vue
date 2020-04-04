@@ -41,6 +41,7 @@
   import showNotify from 'src/helpers/showNotify';
   import showErrors from 'src/helpers/showErrors';
   import getUrl from 'src/helpers/getUrl';
+  import { mapMutations } from "vuex";
 
   export default {
     name: 'Filters',
@@ -65,7 +66,7 @@
         const res = await apiHost.get('/get-preview-filters', params);
         const isSuccess = res.is_success;
         if (!isSuccess) {
-          return showErrors(res  && res.errors);
+          return showErrors(res && res.errors);
         }
         this.filters = res.content.map(filter => {
           filter.activate = false;
@@ -84,7 +85,6 @@
         originImgPath: '',
         resultImgPath: '',
         timerId: null,
-        loader: false,
         filters: [{
           id: 'filter1',
           activate: false,
@@ -129,27 +129,28 @@
       };
     },
     methods: {
+      ...mapMutations(["changeLoaderStatus"]),
       filterChange: async function () {
-        if (this.loader) {
+        if (this.$store.state.loader) {
           return;
         }
         if (this.timerId) {
           clearTimeout(this.timerId);
         }
         this.timerId = setTimeout(async () => {
-          this.loader = true;
+          this.changeLoaderStatus(true);
           const filters = this.filters.filter(filter => filter.activate).map(filter => filter.id).join('&');
           try {
             const res = await apiHost.get(`/use-filters?${filters}`);
             const isSuccess = res.data.is_success;
             if (!isSuccess) {
-              this.loader = false;
+              this.changeLoaderStatus(false);
               return showErrors(res && res.data && res.data.errors);
             }
 
             this.resultImgPath = res.data.content;
           } catch (e) {
-            this.loader = false;
+            this.changeLoaderStatus(false);
             showNotify({
               text: 'Произошла ошибка',
               type: 'error'
@@ -160,6 +161,7 @@
     }
   }
 </script>
+
 
 <style scoped>
     .full-height {
@@ -177,22 +179,23 @@
 
     .origin-photo {
         width: 50%;
-        height: 100%;
+        padding: 15px;
         float: left;
         position: relative;
     }
 
     .future-photo {
         width: 50%;
-        height: 100%;
+        padding: 15px;
         float: right;
         position: relative;
     }
 
     .img-photo {
         background: grey;
-        width: 70%;
+        width: 100%;
         height: 100%;
+        object-fit: cover;
     }
 
     .img-text {

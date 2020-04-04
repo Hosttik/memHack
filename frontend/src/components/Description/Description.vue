@@ -61,7 +61,7 @@
 
     export default {
         name: "Description",
-        beforeCreate: async function () {
+        mounted: async function () {
             const params = {'user_id': localStorage.getItem('memHackUserId')};
             try {
                 const res = await apiHost.get('/get-original-file', params);
@@ -125,10 +125,9 @@
     }
 
     .origin-photo {
-        width: 100%;
-        height: 100%;
         float: left;
         position: relative;
+        padding: 15px;
     }
 
     .form_data {
@@ -138,7 +137,8 @@
 
     .img-photo {
         background: grey;
-        width: 70%;
+        width: 100%;
         height: 100%;
+        object-fit: cover;
     }
 </style>
