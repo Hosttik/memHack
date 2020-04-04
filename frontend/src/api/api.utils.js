@@ -6,7 +6,7 @@ const createNetworkAdapter = config => axios.create(config);
 
 const apiInstance = createNetworkAdapter({
   baseURL: `${config.app.host}`,
-  timeout: AXIOS_TIMEOUT
+  timeout: AXIOS_TIMEOUT,
 });
 
 const errorHandler = (err, method, url) => {

@@ -18,7 +18,7 @@
                 <v-spacer></v-spacer>
             </v-toolbar>
             <v-content>
-                <v-container fluid grid-list-md text-xs-center>
+                <v-container class="full-height" fluid grid-list-md text-xs-center>
                     <router-view></router-view>
                 </v-container>
             </v-content>
@@ -40,12 +40,13 @@
 
 <script>
   import { apiHost } from 'src/api/api.utils';
+  import qs from 'qs';
 
   export default {
     name: 'App',
     created: async function () {
       try {
-        const res = await apiHost.post('http://google.com', {});
+        const res = await apiHost.post('/upload-file', qs.stringify({test: 123}));
         console.log(res);
       } catch (e) {
         console.log(e);
@@ -71,4 +72,7 @@
 </script>
 
 <style scoped>
+    .full-height {
+        height: 100%;
+    }
 </style>
