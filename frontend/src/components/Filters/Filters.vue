@@ -20,10 +20,29 @@
                 <div class="photo-wrap">
                     <div class="origin-photo">
                         <div class="img-text">Оригинал</div>
-                        <img :src="originImgPath" class="img-photo"/></div>
+                        <img :src="originImgPath" v-if="originImgPath" class="img-photo"/>
+                        <v-progress-circular
+                                v-if="!originImgPath"
+                                :size="70"
+                                :width="7"
+                                color="purple"
+                                indeterminate
+                                class="spinner"
+                        ></v-progress-circular>
+                    </div>
+
                     <div class="future-photo">
                         <div class="img-text">Результат</div>
-                        <img :src="originImgPath" class="img-photo"/></div>
+                        <img :src="resultImgPath" v-if="originImgPath" class="img-photo"/>
+                        <v-progress-circular
+                                v-if="!resultImgPath"
+                                :size="70"
+                                :width="7"
+                                color="purple"
+                                indeterminate
+                                class="spinner"
+                        ></v-progress-circular>
+                    </div>
                 </div>
                 <v-btn outline
                        class="ma-2"
@@ -40,6 +59,8 @@
   import { apiHost } from 'src/api/api.utils';
   import showNotify from 'src/helpers/showNotify';
   import showErrors from 'src/helpers/showErrors';
+  import getUrl from 'src/helpers/getUrl';
+  import { mapMutations } from 'vuex';
 
   export default {
     name: 'Filters',
@@ -47,11 +68,11 @@
       const params = {'user_id': localStorage.getItem('memHackUserId')};
       try {
         const res = await apiHost.get('/get-original-file', params);
-        const isSuccess = res.data.is_success;
+        const isSuccess = res.is_success;
         if (!isSuccess) {
-          return showErrors(res && res.data && res.data.errors);
+          return showErrors(res && res.errors);
         }
-        const img = res.data.content;
+        const img = getUrl(res.content.file_path);
         this.originImgPath = img;
         this.resultImgPath = img;
       } catch (e) {
@@ -61,12 +82,12 @@
         })
       }
       try {
-        const res = await apiHost.get('/use-filters', params);
-        const isSuccess = res.data.is_success;
+        const res = await apiHost.get('/get-preview-filters', params);
+        const isSuccess = res.is_success;
         if (!isSuccess) {
-          return showErrors(res && res.data && res.data.errors);
+          return showErrors(res && res.errors);
         }
-        this.filters = res.data.content.map(filter => {
+        this.filters = res.content.map(filter => {
           filter.activate = false;
           return filter
         });
@@ -76,13 +97,13 @@
           type: 'error'
         })
       }
+
     },
     data() {
       return {
         originImgPath: '',
         resultImgPath: '',
         timerId: null,
-        loader: false,
         filters: [{
           id: 'filter1',
           activate: false,
@@ -127,27 +148,28 @@
       };
     },
     methods: {
+      ...mapMutations(['changeLoaderStatus']),
       filterChange: async function () {
-        if (this.loader) {
+        if (this.$store.state.loader) {
           return;
         }
         if (this.timerId) {
           clearTimeout(this.timerId);
         }
         this.timerId = setTimeout(async () => {
-          this.loader = true;
+          this.changeLoaderStatus(true);
           const filters = this.filters.filter(filter => filter.activate).map(filter => filter.id).join('&');
           try {
-            const res = await apiHost.get(`/get-filtered-file?${filters}`);
-            const isSuccess = res.data.is_success;
+            const res = await apiHost.get(`/use-filters?${filters}`);
+            const isSuccess = res.is_success;
             if (!isSuccess) {
-              this.loader = false;
-              return showErrors(res && res.data && res.data.errors);
+              this.changeLoaderStatus(false);
+              return showErrors(res.errors);
             }
 
-            this.resultImgPath = res.data.content;
+            this.resultImgPath = res.content;
           } catch (e) {
-            this.loader = false;
+            this.changeLoaderStatus(false);
             showNotify({
               text: 'Произошла ошибка',
               type: 'error'
@@ -159,9 +181,10 @@
   }
 </script>
 
+
 <style scoped>
     .full-height {
-        height: 720px;
+        height: 100%;
     }
 
     .photo-wrap {
@@ -174,23 +197,32 @@
 
 
     .origin-photo {
-        width: 50%;
-        height: 100%;
         float: left;
         position: relative;
+        width: 450px;
+        height: 480px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: grey;
     }
 
     .future-photo {
-        width: 50%;
-        height: 100%;
         float: right;
         position: relative;
+        width: 450px;
+        height: 480px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: grey;
     }
 
     .img-photo {
         background: grey;
-        width: 70%;
+        width: 100%;
         height: 100%;
+        object-fit: contain;
     }
 
     .img-text {

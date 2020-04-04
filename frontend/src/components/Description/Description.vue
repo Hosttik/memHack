@@ -6,7 +6,15 @@
                 <v-card class="full-height">
                     <div class="photo-wrap d-inline-block">
                         <div class="origin-photo">
-                            <img :src="originImgPath" class="img-photo"/>
+                            <img :src="originImgPath" v-if="originImgPath" class="img-photo"/>
+                            <v-progress-circular
+                                    v-if="!originImgPath"
+                                    :size="70"
+                                    :width="7"
+                                    color="purple"
+                                    indeterminate
+                                    class="spinner"
+                            ></v-progress-circular>
                         </div>
                     </div>
                     <div class="d-inline-block form_data">
@@ -57,19 +65,19 @@
     import { apiHost } from 'src/api/api.utils';
     import showNotify from 'src/helpers/showNotify';
     import showErrors from 'src/helpers/showErrors';
+    import getUrl from 'src/helpers/getUrl';
 
     export default {
         name: "Description",
-        beforeCreate: async function () {
+        mounted: async function () {
             const params = {'user_id': localStorage.getItem('memHackUserId')};
             try {
                 const res = await apiHost.get('/get-original-file', params);
-                const isSuccess = res.data.is_success;
+                const isSuccess = res.is_success;
                 if (!isSuccess) {
-                    return showErrors(res && res.data && res.data.errors);
+                    return showErrors(res && res.errors);
                 }
-                const img = res.data.content;
-                this.originImgPath = img;
+                this.originImgPath = getUrl(res.content.file_path);
             } catch (e) {
                 showNotify({
                     text: 'Произошла ошибка',
@@ -91,14 +99,14 @@
             upload: async function () {
                 try {
                     const res = await apiHost.get('/save-description', {...this.description, 'user_id': localStorage.getItem('memHackUserId')});
-                    if (res.data.is_success) {
+                    if (res.is_success) {
                         showNotify({
                             text: 'Данные успешно загружены',
                             type: 'success'
                         });
                         this.$router.push({path: 'filters'})
                     } else {
-                        showErrors(res && res.data && res.data.errors);
+                        showErrors(res.errors);
                     }
                 } catch (e) {
                     showNotify({
@@ -117,7 +125,7 @@
     }
 
     .photo-wrap {
-        padding: 20px 0;
+        padding: 10px;
         width: 50%;
         height: 100%;
         float: left;
@@ -125,10 +133,14 @@
     }
 
     .origin-photo {
-        width: 100%;
-        height: 100%;
         float: left;
         position: relative;
+        width: 600px;
+        height: 530px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: grey;
     }
 
     .form_data {
@@ -138,7 +150,8 @@
 
     .img-photo {
         background: grey;
-        width: 70%;
+        width: 100%;
         height: 100%;
+        object-fit: contain;
     }
 </style>

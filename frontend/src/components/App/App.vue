@@ -1,6 +1,15 @@
 <template>
     <div id="app">
         <v-app>
+            <div class="overlay" v-if="$store.state.loader">
+                <v-progress-circular
+                        :size="70"
+                        :width="7"
+                        color="purple"
+                        indeterminate
+                        class="spinner-loader"
+                ></v-progress-circular>
+            </div>
             <notifications group="main"></notifications>
             <v-toolbar dark tabs flat color="primary">
                 <v-spacer></v-spacer>
@@ -40,14 +49,14 @@
 </template>
 
 <script>
-  import Vue from 'vue';
+  import { v4 as uuidv4 } from 'uuid';
 
   export default {
     name: 'App',
     beforeCreate: async function () {
       const userId = localStorage.getItem('memHackUserId');
       if (!userId) {
-        localStorage.setItem('memHackUserId', 1);
+        localStorage.setItem('memHackUserId', uuidv4());
       }
     },
     data() {
@@ -70,7 +79,14 @@
 </script>
 
 <style scoped>
-    .full-height {
+    .overlay {
+        background: rgba(0, 0, 0, 0.4);
+        width: 100%;
         height: 100%;
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
     }
 </style>

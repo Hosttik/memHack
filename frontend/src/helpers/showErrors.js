@@ -2,12 +2,12 @@ import showNotify from './showNotify';
 
 const showErrors = (errors) => {
   if (errors && errors.length) {
-    for (error of errors) {
+    errors.forEach(error=>{
       showNotify({
         text: error,
         type: 'error'
       })
-    }
+    });
   } else {
     showNotify({
       text: 'Произошла ошибка',

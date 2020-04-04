@@ -1,18 +1,32 @@
 <template>
     <div v-cloak @drop.prevent="addFile" @dragover.prevent class="dropArea">
-        <h2>Перетащите файл</h2>
         <div>
-            <p>Поддерживаемый формат файла: jpg, jpeg, png.</p>
-            <p>Максимальный размер изображения 5 Mb.</p>
-        </div>
-        <ul>
-            <li v-for="file in files">
-                {{ file.name }} {{ file.size }}
-                <button @click="removeFile(file)" title="Remove">X</button>
-            </li>
-        </ul>
+            <h2>Перетащите файл</h2>
+            <v-radio-group v-model="nextPath" column>
+                <v-radio
+                        label="Загрузка фотографии для применении фильтров"
+                        color="indigo"
+                        value="description"
+                ></v-radio>
+                <v-radio
+                        label="Загрузка фотографии для поиска медалей на фото"
+                        color="indigo"
+                        value="medals"
+                ></v-radio>
+            </v-radio-group>
+            <div>
+                <p>Поддерживаемый формат файла: jpg, jpeg, png.</p>
+                <p>Максимальный размер изображения 5 Mb.</p>
+            </div>
+            <ul>
+                <li v-for="file in files">
+                    {{ file.name }} {{ file.size }}
+                    <button @click="removeFile(file)" title="Remove">X</button>
+                </li>
+            </ul>
 
-        <v-btn :disabled="uploadDisabled" @click="upload">Загрузить файл</v-btn>
+            <v-btn :disabled="uploadDisabled" @click="upload">Загрузить файл</v-btn>
+        </div>
     </div>
 </template>
 
@@ -21,11 +35,13 @@
   import { apiHost } from 'src/api/api.utils';
   import showNotify from 'src/helpers/showNotify';
   import showErrors from 'src/helpers/showErrors';
+  import { mapMutations } from "vuex";
 
   export default {
     name: 'Load',
     data() {
       return {
+        nextPath: 'description',
         files: [],
       };
     },
@@ -35,6 +51,7 @@
       }
     },
     methods: {
+      ...mapMutations(["changeLoaderStatus"]),
       addFile(e) {
         if (this.files.length === 1) {
           return;
@@ -53,22 +70,26 @@
         });
       },
       upload: async function () {
+        this.changeLoaderStatus(true);
         let file = this.files.shift();
         const formData = new FormData();
         formData.append('user_id', localStorage.getItem('memHackUserId'));
         formData.append('file', file);
         try {
           const res = await apiHost.post('/upload-file', formData);
-          if (res.data.is_success) {
+          if (res.is_success) {
+            this.changeLoaderStatus(false);
             showNotify({
               text: 'Картинка успешно загружена',
               type: 'success'
             });
-            this.$router.push({path: 'description'})
+            this.$router.push({path: this.nextPath})
           } else {
-            showErrors(res && res.data && res.data.errors);
+            this.changeLoaderStatus(false);
+            showErrors(res && res.errors);
           }
         } catch (e) {
+          this.changeLoaderStatus(false);
           showNotify({
             text: 'Ошибка загрузки файла',
             type: 'error'
@@ -81,8 +102,13 @@
 
 <style scoped>
     .dropArea {
-        background-color: lightblue;
-        border: 2px solid darkgray;
+        background-color: #e8ebec;;
+        border: 2px dashed #5c6ac0;
         min-height: 400px;
+        position: relative;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        display: flex;
     }
 </style>
