@@ -44,7 +44,7 @@
           class="primary white--text text-xs-center"
         >
           <v-card-text class="white--text">
-            &copy;2019 — <strong>BUGuvix</strong>
+            &copy;2020 — <strong>BUGuvix</strong>
           </v-card-text>
         </v-card>
       </v-footer>
