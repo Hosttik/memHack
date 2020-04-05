@@ -35,13 +35,13 @@
   import { apiHost } from 'src/api/api.utils';
   import showNotify from 'src/helpers/showNotify';
   import showErrors from 'src/helpers/showErrors';
-  import { mapMutations } from "vuex";
+  import { mapMutations } from 'vuex';
 
   export default {
     name: 'Load',
     data() {
       return {
-        nextPath: 'description',
+        nextPath: 'medals',
         files: [],
       };
     },
@@ -51,7 +51,7 @@
       }
     },
     methods: {
-      ...mapMutations(["changeLoaderStatus"]),
+      ...mapMutations(['changeLoaderStatus']),
       addFile(e) {
         if (this.files.length === 1) {
           return;
@@ -70,26 +70,44 @@
         });
       },
       upload: async function () {
-        this.changeLoaderStatus(true);
+        this.changeLoaderStatus({
+          status: true,
+          message: 'Идет загрузка фото...'
+        });
         let file = this.files.shift();
         const formData = new FormData();
         formData.append('user_id', localStorage.getItem('memHackUserId'));
         formData.append('file', file);
+        formData.append(
+          'medals',
+          this.nextPath === 'medals'
+          ? 1
+          : 0);
         try {
           const res = await apiHost.post('/upload-file', formData);
           if (res.is_success) {
-            this.changeLoaderStatus(false);
+            this.changeLoaderStatus({
+              status: false,
+              message: ''
+            });
             showNotify({
               text: 'Картинка успешно загружена',
               type: 'success'
             });
-            this.$router.push({path: this.nextPath})
+            const content = JSON.stringify(res.content);
+            this.$router.push({path: `${this.nextPath}?params=${content}`})
           } else {
-            this.changeLoaderStatus(false);
+            this.changeLoaderStatus({
+              status: false,
+              message: ''
+            });
             showErrors(res && res.errors);
           }
         } catch (e) {
-          this.changeLoaderStatus(false);
+          this.changeLoaderStatus({
+            status: false,
+            message: ''
+          });
           showNotify({
             text: 'Ошибка загрузки файла',
             type: 'error'
