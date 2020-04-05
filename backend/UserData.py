@@ -22,11 +22,11 @@ class UserData:
             image.load_from_dir(os.path.normpath(self.working_dir + "/" + entry.name), entry.name)
             self.images.append(image)
 
-    def add_image(self, image_data, description=None):
+    def add_image(self, image_data, description=None, for_medals=False):
         image = UserImageData()
         name = str(len(os.listdir(self.working_dir)) + 1)
         idir = os.path.normpath(self.working_dir + '/' + name)
-        if not image.create_from_data(idir, name, image_data, description):
+        if not image.create_from_data(idir, name, image_data, description, for_medals):
             return False
         self.images.append(image)
         return True
@@ -38,7 +38,7 @@ class UserData:
 
 
 class UserImageData:
-    def __init__(self, dir = None, name = None, data = None, description = None):
+    def __init__(self, dir = None, name = None, data = None, description = None, for_medals=False):
         self.dir = None
         self.name = None
         self.path = None
@@ -46,36 +46,32 @@ class UserImageData:
         self.previews_dir = None
         self.release_dir = None
         self.previews_paths = {}
+        self.release_path = None
+        self.for_medals = for_medals
         if dir is not None:
             self.create_from_data(dir, name, data, description)
 
-    def create_from_data(self, dir, name, data, description=None):
+    def create_from_data(self, dir, name, data, description=None, for_medals=False):
         self.dir = dir
         self.name = name
+        self.for_medals = for_medals
         if dir is not None:
             if not os.path.exists(dir):
                 os.mkdir(dir)
                 if not os.path.exists(dir):
                     return False
             self.path = dir + '/' + name + '.png'
-            self.description_path = os.path.normpath(dir + '/' + name + '_description.json')
-            self.previews_dir = os.path.normpath(dir + '/previews')
-            self.release_dir = os.path.normpath(dir + '/release')
-            os.mkdir(self.previews_dir)
-            os.mkdir(self.release_dir)
 
             data.save(self.path)
 
-            for filter in filters_list:
-                image = None
-                if filter == 'immortal_regiment':
-                    image = getattr(simple_filters, filter)(self.path, "Иван", "HAru6aTOP", "Иванович")
-                else:
-                    image = getattr(simple_filters, filter)(self.path)
-                image = resize_image_for_preview(image)
-                path = self.previews_dir + "/" + self.name + '_' + filter + '.png'
-                save_image(image, os.path.normpath(path))
-                self.previews_paths.update({filter : path})
+            if not self.for_medals:
+                self.description_path = os.path.normpath(dir + '/' + name + '_description.json')
+                self.previews_dir = os.path.normpath(dir + '/previews')
+                self.release_dir = os.path.normpath(dir + '/release')
+                self.release_path = os.path.normpath(self.release_dir + '/' + self.name + '_release.png')
+                os.mkdir(self.previews_dir)
+                os.mkdir(self.release_dir)
+                self.update_previews(filters_list)
 
             return True
 
@@ -90,8 +86,11 @@ class UserImageData:
                 self.name = str(entry.name).split('.')[0]
             elif entry.name == 'previews':
                 self.previews_dir = entry.path
+                self.for_medals = False
             elif entry.name == 'release':
                 self.release_dir = entry.path
+                self.for_medals = False
+                self.release_path = os.path.normpath(self.release_dir + '/' + self.name + '_release.png')
 
         entries = os.scandir(self.previews_dir)
         for entry in entries:
@@ -99,7 +98,6 @@ class UserImageData:
                 if filter in entry.name:
                     self.previews_paths.update({filter : entry.path})
                     break
-
 
     def set_description(self, description):
         if self.description_path is None:
@@ -121,7 +119,66 @@ class UserImageData:
         # os.write(fd, description)
         #
         # os.close(fd)
+
+        self.update_previews(['immortal_regiment'])
+
         return True
+
+    def update_previews(self, filters):
+        for filter in filters:
+            image = None
+            image = load_image(self.path)
+            image = resize_image_for_preview(image)
+            if filter == 'immortal_regiment':
+                print('path: ' + self.description_path)
+                if self.description_path is not None and os.path.exists(self.description_path):
+                    with open(self.description_path) as json_file:
+                        descr = json.load(json_file)
+                        fname = descr['first_name']
+                        lname = descr['last_name']
+                        mname = descr['last_name']
+                        rank = descr['rank']
+                        info = descr['info']
+                        image = getattr(simple_filters, filter)(image, fname, lname, mname, rank)
+                else:
+                    image = getattr(simple_filters, filter)(image)
+            else:
+                image = getattr(simple_filters, filter)(image)
+            path = self.previews_dir + "/" + self.name + '_' + filter + '.png'
+            save_image(image, os.path.normpath(path))
+            self.previews_paths.update({filter: path})
+
+    def apply_filters(self, filters):
+        if self.path is None or not os.path.exists(self.path):
+            return False
+        image = load_image(self.path)
+        for filter in filters:
+            if filter in filters_list:
+                if filter == 'immortal_regiment':
+                    if self.description_path is not None and os.path.exists(self.description_path):
+                        with open(self.description_path) as json_file:
+                            descr = json.load(json_file)
+                            fname = descr['first_name']
+                            lname = descr['last_name']
+                            mname = descr['last_name']
+                            rank = descr['rank']
+                            info = descr['info']
+                            image = getattr(simple_filters, filter)(image, fname, lname, mname, rank)
+                    else:
+                        image = getattr(simple_filters, filter)(image)
+                else:
+                    image = getattr(simple_filters, filter)(image)
+        if image is None:
+            return False
+
+        save_image(image, self.release_path)
+
+        return True
+
+    def get_release_path(self):
+        if self.release_path is None or not os.path.exists(self.release_path):
+            return None
+        return self.release_path
 
 
 
@@ -134,13 +191,13 @@ def get_user_data(user_id):
     user.load_user_data(path)
     return user
 
-def upload_user_image(user_id, image_data):
+def upload_user_image(user_id, for_medals, image_data):
     user = get_user_data(user_id)
     if user is None:
         user = create_user(user_id)
     if user is None:
         return None
-    if not user.add_image(image_data):
+    if not user.add_image(image_data, for_medals=for_medals):
         return None
     return user
 
