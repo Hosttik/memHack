@@ -1,6 +1,6 @@
 <template>
     <v-layout row>
-        <v-flex xs12 sm6 offset-sm3>
+        <v-flex xs12>
             <v-card>sdfdfgdfg</v-card>
         </v-flex>
     </v-layout>
