@@ -26,7 +26,10 @@ const devConfig = merge.smart(baseConfig, {
   plugins: [new webpack.NamedModulesPlugin()],
 
   devServer: {
-    contentBase: path.join(projectRootDir, "dist"),
+    contentBase: [
+      path.join(projectRootDir, "dist"),
+      path.join(projectRootDir, "src",'assets')
+    ],
     port,
     historyApiFallback: true,
     inline: true,

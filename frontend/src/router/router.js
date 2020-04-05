@@ -4,8 +4,8 @@ import Account from 'src/components/Account/Account';
 import Filters from 'src/components/Filters/Filters';
 import Load from 'src/components/Load/Load';
 import Finish from 'src/components/Finish/Finish';
-import Description from "src/components/Description/Description";
-import Medals from "src/components/Medals/Medals";
+import Description from 'src/components/Description/Description';
+import Medals from 'src/components/Medals/Medals';
 
 
 Vue.use(Router);
@@ -28,13 +28,14 @@ export default new Router({
     path: '/finish',
     name: 'Результат',
     component: Finish
-  },{
+  }, {
     path: '/description',
     name: 'Описание',
     component: Description
-  },{
+  }, {
     path: '/medals',
     name: 'Награды',
-    component: Medals
+    component: Medals,
+    props: (route) => ({query: route.query.q})
   }]
 });

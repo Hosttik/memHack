@@ -1,5 +1,5 @@
 export default {
   app: {
-    host: "http://e44e7a31.ngrok.io"
+    host: "http://ab09e02f.ngrok.io"
   }
 };

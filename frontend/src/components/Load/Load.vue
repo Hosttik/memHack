@@ -78,6 +78,11 @@
         const formData = new FormData();
         formData.append('user_id', localStorage.getItem('memHackUserId'));
         formData.append('file', file);
+        formData.append(
+          'medals',
+          this.nextPath === 'medals'
+          ? 1
+          : 0);
         try {
           const res = await apiHost.post('/upload-file', formData);
           if (res.is_success) {
@@ -89,7 +94,8 @@
               text: 'Картинка успешно загружена',
               type: 'success'
             });
-            this.$router.push({path: this.nextPath})
+            const content = JSON.stringify(res.content);
+            this.$router.push({path: `${this.nextPath}?params=${content}`})
           } else {
             this.changeLoaderStatus({
               status: false,
