@@ -43,12 +43,31 @@ def upload_file():
     user_id = str(request.forms.get('user_id'))
     print('upload-file -> ID:' + user_id)
 
+    medals = bool(str(request.forms.get('medals')))
+    print('upload-file -> medals:' + str(medals))
+
     image_data = request.files.get('file')
 
-    result = upload_user_image(user_id, image_data)
+    result = upload_user_image(user_id, medals, image_data)
     is_success = True if result is not None else False
     if not is_success:
         answer = {'is_success': is_success, 'content': {}, 'errors': ["Can't load user data."]}
+
+    user = get_user_data(user_id)
+    if user is None:
+        answer = {'is_success': False, 'content': {}, 'errors': ["Can't load user data."]}
+        return dumps(answer)
+    image = user.get_current_image()
+    if image is None:
+        answer = {'is_success': False, 'content': {}, 'errors': ["There is now loaded images."]}
+        return dumps(answer)
+
+    image_path = image.path
+
+    serv_path = to_server_path(image_path)
+
+    if medals:
+        answer = {'is_success': is_success, 'content': {'file_path': serv_path, 'medals': ['medal_1', 'medal_2', 'medal_3']}, 'errors': []}
     else:
         answer = {'is_success': is_success, 'content': {}, 'errors': []}
     return dumps(answer)
@@ -208,6 +227,10 @@ def save_description():
         answer = {'is_success': is_success, 'content': {}, 'errors': []}
 
     return dumps(answer)
+
+
+@route('/save-description', method='GET')
+@allow_cors
 
 
 @route('/static/<filepath:path>')
