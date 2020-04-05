@@ -23,7 +23,10 @@ def resize_image_for_preview(image):
     ratio = max_preview_size/width if height < width else max_preview_size/height
     new_image = resize(image, (int(height*ratio), int(width*ratio)))
 
+    print('[' + str(width) + str(height) + '] ---> [' + str(int(height*ratio)) + str(int(width*ratio)) + ']')
+
     return new_image
+
 
 def create_img(width, height, color):
     if isinstance(color, tuple) or isinstance(color, list):

@@ -145,6 +145,8 @@ class UserImageData:
             else:
                 image = getattr(simple_filters, filter)(image)
 
+            image = resize_image_for_preview(image)
+
             path = self.previews_dir + "/" + self.name + '_' + filter + '.png'
             save_image(image, os.path.normpath(path))
             self.previews_paths.update({filter: path})
@@ -172,7 +174,13 @@ class UserImageData:
         if image is None:
             return False
 
+        height = image.shape[0]
+        width = image.shape[1]
+
+        image = resize(image, (height//2, width//2))
+
         save_image(image, self.release_path)
+
 
         return True
 
