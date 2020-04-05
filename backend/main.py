@@ -61,8 +61,8 @@ def get_original_file():
 
     print('get-original-file -> ID: ' + user_id)
 
-    user = get_user_data(user_id)
     answer = {}
+    user = get_user_data(user_id)
     if user is None:
         answer = {'is_success': False, 'content': {}, 'errors': ["Can't load user data."]}
         return dumps(answer)
@@ -78,21 +78,73 @@ def get_original_file():
     answer = {'is_success': True, 'content': {"file_path" : serv_path}, 'errors': []}
     return dumps(answer)
 
-@route('/use-filters', method='GET')
+
+@route('/use-filters', method='POST')
 @allow_cors
 def use_filters():
+    data = json.loads(request.forms.get('params'))
+    user_id = data['user_id']
+    print('use-filters -> ID:' + user_id)
+
+    filters = data['filters']
     answer = {}
+
+    print('filters: ' + ' '.join(filters))
+
+    user = get_user_data(user_id)
+    if user is None:
+        answer = {'is_success': False, 'content': {}, 'errors': ["Can't load user data."]}
+        return dumps(answer)
+    image = user.get_current_image()
+    if image is None:
+        answer = {'is_success': False, 'content': {}, 'errors': ["There is now loaded images."]}
+        return dumps(answer)
+
+    res = image.apply_filters(filters)
+
+    if not res:
+        answer = {'is_success': False, 'content': {}, 'errors': ["Filters applying error."]}
+        return dumps(answer)
+
+    path = image.get_release_path()
+    if path is None:
+        answer = {'is_success': False, 'content': {}, 'errors': ["There is no release file."]}
+        return dumps(answer)
+
+    serv_path = to_server_path(path)
+
+    answer = {'is_success': True, 'content': {"file_path": serv_path}, 'errors': []}
     return dumps(answer)
 
 
 @route('/get-filtered-file', method='POST')
 @allow_cors
 def get_filtered_file():
-    print('Success!!!')
-    answer = {'result': 'Ok!'}
+    user_id = request.query.user_id
+
+    print('get-filtered-file -> ID: ' + user_id)
+
+    answer = {}
+    user = get_user_data(user_id)
+    if user is None:
+        answer = {'is_success': False, 'content': {}, 'errors': ["Can't load user data."]}
+        return dumps(answer)
+    image = user.get_current_image()
+    if image is None:
+        answer = {'is_success': False, 'content': {}, 'errors': ["There is now loaded images."]}
+        return dumps(answer)
+
+    image_path = image.path
+
+    path = image.get_release_path()
+    if path is None:
+        answer = {'is_success': False, 'content': {}, 'errors': ["There is no release file."]}
+        return dumps(answer)
+
+    serv_path = to_server_path(path)
+
+    answer = {'is_success': True, 'content': {"file_path": serv_path}, 'errors': []}
     return dumps(answer)
-    js_res = ''
-    return js_res
 
 
 @route('/get-preview-filters', method='GET')

@@ -10,7 +10,7 @@ APIKEY = '01d374f9-62b3-49ef-84a1-27f6c81df358'
 
 max_preview_size = 250
 
-filters_list = ['colorize', 'upscale', 'immortal_regiment']
+filters_list = ['upscale', 'colorize', 'immortal_regiment']
 filters_names_dict = {'colorize' : "Наложение цвета", 'upscale': "Масштабирование", 'immortal_regiment': 'Бессмертный полк'}
 
 def resize_image_for_preview(image):
@@ -160,20 +160,21 @@ def immortal_regiment(image, first_name=None, last_name=None, middle_name=None, 
     width, height = 2635, 3437
     text_start_1 = 3800
     text_start_2 = 4150
+    text_start_3 = 4496
     margin = 300
     fontname = 'arial'
     fontsize = 300
 
-    def add_text_to_line(img, text, ypos):
+    def add_text_to_line(img, text, ypos, font_size):
         delta = 0
         text_width = img.shape[1]
         left = 0
         while text_width + 2 * margin > img.shape[1]:
-            text_size = get_text_size(text, fontname=fontname, fontsize=fontsize - delta)
+            text_size = get_text_size(text, fontname=fontname, fontsize=font_size - delta)
             text_width = text_size[0]
             left = (img.shape[1] - text_width - 2 * margin) // 2 + margin
             delta += 10
-        return draw_text(img, text, (left, ypos), fontname=fontname, fontsize=fontsize)
+        return draw_text(img, text, (left, ypos), fontname=fontname, fontsize=font_size)
 
     image = upscale(image)
 
@@ -195,13 +196,15 @@ def immortal_regiment(image, first_name=None, last_name=None, middle_name=None, 
 
     print('Adding text..')
     if last_name is not None:
-        image = add_text_to_line(image, last_name.upper(), text_start_1)
+        image = add_text_to_line(image, last_name.upper(), text_start_1, fontsize)
     s = ''
     if first_name is not None:
         s += first_name
     if middle_name is not None:
         s += ' {}'.format(middle_name)
     if len(s) > 0:
-        image = add_text_to_line(image, s, text_start_2)
+        image = add_text_to_line(image, s, text_start_2, fontsize)
+    if rank is not None:
+        image = add_text_to_line(image, 'Звание: {}'.format(rank), text_start_3, int(0.6 * fontsize))
 
     return image
