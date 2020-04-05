@@ -4,9 +4,9 @@
             <v-card class="full-height filters"><h1>Фильтры</h1>
                 <v-list>
                     <template v-for="filter in filters">
-                        <div :key="filter.id">
-                            <v-list-tile>
-                                <v-switch @change="filterChange" v-model="filter.activate" inset
+                        <div :key="filter.id" class="filter-wrap">
+                            <v-list-tile class="switcher-wrap">
+                                <v-switch @change="filterChange" class="switcher" v-model="filter.activate" inset
                                           :label="filter.name"></v-switch>
                             </v-list-tile>
                             <img :src="filter.path"/>
@@ -89,6 +89,7 @@
         }
         this.filters = res.content.map(filter => {
           filter.activate = false;
+          filter.path = getUrl(filter.path);
           return filter
         });
       } catch (e) {
@@ -104,47 +105,7 @@
         originImgPath: '',
         resultImgPath: '',
         timerId: null,
-        filters: [{
-          id: 'filter1',
-          activate: false,
-          name: 'Фильтр первый йопта',
-          path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
-        }, {
-          id: 'filter2',
-          activate: false,
-          name: 'Фильтр второй йопта',
-          path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
-        }, {
-          id: 'filter3',
-          activate: false,
-          name: 'Фильтр третий йопта',
-          path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
-        }, {
-          id: 'filter4',
-          activate: false,
-          name: 'Фильтр четвертый йопта',
-          path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
-        }, {
-          id: 'filter5',
-          activate: false,
-          name: 'Фильтр пятый йопта',
-          path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
-        }, {
-          id: 'filter6',
-          activate: false,
-          name: 'Фильтр шестой йопта',
-          path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
-        }, {
-          id: 'filter7',
-          activate: false,
-          name: 'Фильтр седьмой йопта',
-          path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
-        }, {
-          id: 'filter8',
-          activate: false,
-          name: 'Фильтр восьмой йопта',
-          path: 'https://lh3.googleusercontent.com/proxy/jqgFmlrKj1jNJOWYraERsfjoMitJ7lHQ8fUQi1VD5od9ThNF2iujR_waJIJaOdWVcfXojaGlMSPhPU9AuFdK44eqAWZIyg'
-        },]
+        filters: []
       };
     },
     methods: {
@@ -182,9 +143,10 @@
 </script>
 
 
-<style scoped>
+<style>
     .full-height {
         height: 100%;
+        max-height: 640px;
     }
 
     .photo-wrap {
@@ -234,6 +196,21 @@
 
     .filters {
         overflow: scroll;
+    }
+
+    .filter-wrap {
+        position: relative;
+        height: 260px;
+    }
+
+    .switcher-wrap {
+        position: absolute;
+        bottom: 65px;
+        background: rgba(115, 115, 115, 0.6);
+    }
+
+    .switcher label {
+        color: #fff !important;
     }
 
 </style>
