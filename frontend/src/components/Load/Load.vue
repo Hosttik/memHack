@@ -41,7 +41,7 @@
     name: 'Load',
     data() {
       return {
-        nextPath: 'description',
+        nextPath: 'medals',
         files: [],
       };
     },
