@@ -43,7 +43,7 @@ def upload_file():
     user_id = str(request.forms.get('user_id'))
     print('upload-file -> ID:' + user_id)
 
-    medals = bool(str(request.forms.get('medals')))
+    medals = bool(int(str(request.forms.get('medals'))))
     print('upload-file -> medals:' + str(medals))
 
     image_data = request.files.get('file')
@@ -214,12 +214,18 @@ def save_description():
         answer = {'is_success': False, 'content': {}, 'errors': ["Can't load user data."]}
         return dumps(answer)
 
+    print ('userdata ok')
+
     image = user.get_current_image()
     if image is None:
         answer = {'is_success': False, 'content': {}, 'errors': ["There is now loaded images."]}
         return dumps(answer)
 
+    print('image ok')
+
     is_success = image.set_description(descr)
+
+    print('descrs ok')
 
     if not is_success:
         answer = {'is_success': is_success, 'content': {}, 'errors': ["Can't save description."]}
@@ -227,10 +233,6 @@ def save_description():
         answer = {'is_success': is_success, 'content': {}, 'errors': []}
 
     return dumps(answer)
-
-
-@route('/save-description', method='GET')
-@allow_cors
 
 
 @route('/static/<filepath:path>')

@@ -144,6 +144,7 @@ class UserImageData:
                     image = getattr(simple_filters, filter)(image)
             else:
                 image = getattr(simple_filters, filter)(image)
+
             path = self.previews_dir + "/" + self.name + '_' + filter + '.png'
             save_image(image, os.path.normpath(path))
             self.previews_paths.update({filter: path})
