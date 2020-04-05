@@ -11,6 +11,7 @@ from bottle import run, route, response, request, static_file
 import json
 from json import dumps
 from UserData import *
+import ast
 
 global_working_directory = './data'
 #================================ SERVER ==========================================
@@ -73,24 +74,20 @@ def get_original_file():
     image_path = image.path
 
     serv_path = to_server_path(image_path)
-    print(serv_path)
 
     answer = {'is_success': True, 'content': {"file_path" : serv_path}, 'errors': []}
     return dumps(answer)
 
-@route('/use-filters', method='POST')
+@route('/use-filters', method='GET')
 @allow_cors
-def use_filters(self):
-    print('Success!!!')
-    answer = {'result': 'Ok!'}
+def use_filters():
+    answer = {}
     return dumps(answer)
-    js_res = ''
-    return js_res
 
 
 @route('/get-filtered-file', method='POST')
 @allow_cors
-def get_filtered_file(self):
+def get_filtered_file():
     print('Success!!!')
     answer = {'result': 'Ok!'}
     return dumps(answer)
@@ -98,14 +95,30 @@ def get_filtered_file(self):
     return js_res
 
 
-@route('/get-preview-filters', method='POST')
+@route('/get-preview-filters', method='GET')
 @allow_cors
-def get_preview_filters(self):
-    print('Success!!!')
-    answer = {'result': 'Ok!'}
+def get_preview_filters():
+    user_id = request.query.user_id
+
+    print('get-original-file -> ID: ' + user_id)
+
+    user = get_user_data(user_id)
+    if user is None:
+        answer = {'is_success': False, 'content': {}, 'errors': ["Can't load user data."]}
+        return dumps(answer)
+    image = user.get_current_image()
+    if image is None:
+        answer = {'is_success': False, 'content': {}, 'errors': ["There is now loaded images."]}
+        return dumps(answer)
+
+    answer = []
+    for p in list(image.previews_paths.keys()):
+        ans = {'id' : p, 'name' : filters_names_dict[p], 'path' : to_server_path(image.previews_paths[p])}
+        answer.append(ans)
+
+    answer = {'is_success': True, 'content' : answer, 'errors': []}
+
     return dumps(answer)
-    js_res = ''
-    return js_res
 
 
 @route('/save-description', method='GET')

@@ -1,5 +1,7 @@
 import os
 import json
+from simple_filters import *
+import simple_filters
 
 global_working_directory = './data'
 
@@ -41,6 +43,9 @@ class UserImageData:
         self.name = None
         self.path = None
         self.description_path = None
+        self.previews_dir = None
+        self.release_dir = None
+        self.previews_paths = {}
         if dir is not None:
             self.create_from_data(dir, name, data, description)
 
@@ -48,13 +53,30 @@ class UserImageData:
         self.dir = dir
         self.name = name
         if dir is not None:
-            if not os.path.isdir(dir):
+            if not os.path.exists(dir):
                 os.mkdir(dir)
-                if not os.path.isdir(dir):
+                if not os.path.exists(dir):
                     return False
             self.path = dir + '/' + name + '.png'
             self.description_path = os.path.normpath(dir + '/' + name + '_description.json')
+            self.previews_dir = os.path.normpath(dir + '/previews')
+            self.release_dir = os.path.normpath(dir + '/release')
+            os.mkdir(self.previews_dir)
+            os.mkdir(self.release_dir)
+
             data.save(self.path)
+
+            for filter in filters_list:
+                image = None
+                if filter == 'immortal_regiment':
+                    image = getattr(simple_filters, filter)(self.path, "Иван", "HAru6aTOP", "Иванович")
+                else:
+                    image = getattr(simple_filters, filter)(self.path)
+                image = resize_image_for_preview(image)
+                path = self.previews_dir + "/" + self.name + '_' + filter + '.png'
+                save_image(image, os.path.normpath(path))
+                self.previews_paths.update({filter : path})
+
             return True
 
     def load_from_dir(self, dir, name):
@@ -66,6 +88,18 @@ class UserImageData:
             elif entry.is_file() and entry.path.endswith(('.jpg', '.png')):
                 self.path = entry.path
                 self.name = str(entry.name).split('.')[0]
+            elif entry.name == 'previews':
+                self.previews_dir = entry.path
+            elif entry.name == 'release':
+                self.release_dir = entry.path
+
+        entries = os.scandir(self.previews_dir)
+        for entry in entries:
+            for filter in filters_list:
+                if filter in entry.name:
+                    self.previews_paths.update({filter : entry.path})
+                    break
+
 
     def set_description(self, description):
         if self.description_path is None:
