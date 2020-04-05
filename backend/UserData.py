@@ -1,5 +1,7 @@
 import os
 import json
+from simple_filters import *
+import simple_filters
 
 global_working_directory = './data'
 
@@ -41,6 +43,9 @@ class UserImageData:
         self.name = None
         self.path = None
         self.description_path = None
+        self.previews_dir = None
+        self.release_dir = None
+        self.previews_paths = {}
         if dir is not None:
             self.create_from_data(dir, name, data, description)
 
@@ -48,23 +53,76 @@ class UserImageData:
         self.dir = dir
         self.name = name
         if dir is not None:
-            if not os.path.isdir(dir):
+            if not os.path.exists(dir):
                 os.mkdir(dir)
-                if not os.path.isdir(dir):
+                if not os.path.exists(dir):
                     return False
             self.path = dir + '/' + name + '.png'
             self.description_path = os.path.normpath(dir + '/' + name + '_description.json')
+            self.previews_dir = os.path.normpath(dir + '/previews')
+            self.release_dir = os.path.normpath(dir + '/release')
+            os.mkdir(self.previews_dir)
+            os.mkdir(self.release_dir)
+
             data.save(self.path)
+
+            for filter in filters_list:
+                image = None
+                if filter == 'immortal_regiment':
+                    image = getattr(simple_filters, filter)(self.path, "Иван", "HAru6aTOP", "Иванович")
+                else:
+                    image = getattr(simple_filters, filter)(self.path)
+                image = resize_image_for_preview(image)
+                path = self.previews_dir + "/" + self.name + '_' + filter + '.png'
+                save_image(image, os.path.normpath(path))
+                self.previews_paths.update({filter : path})
+
             return True
 
     def load_from_dir(self, dir, name):
         self.dir = dir
         entries = os.scandir(self.dir)
         for entry in entries:
-            if entry.is_file() and entry.name == 'description.json':
-                self.description_path = entry
+            if entry.is_file() and entry.name.endswith('.json'):
+                self.description_path = entry.path
             elif entry.is_file() and entry.path.endswith(('.jpg', '.png')):
                 self.path = entry.path
+                self.name = str(entry.name).split('.')[0]
+            elif entry.name == 'previews':
+                self.previews_dir = entry.path
+            elif entry.name == 'release':
+                self.release_dir = entry.path
+
+        entries = os.scandir(self.previews_dir)
+        for entry in entries:
+            for filter in filters_list:
+                if filter in entry.name:
+                    self.previews_paths.update({filter : entry.path})
+                    break
+
+
+    def set_description(self, description):
+        if self.description_path is None:
+            if self.dir is not None and self.name is not None:
+                self.description_path = self.dir + '/' + self.name + '_description.json'
+            else:
+                print("Error: Image: Description: description path is empty")
+                return False
+
+        with open(self.description_path, 'w') as outfile:
+            json.dump(description, outfile)
+        # fd = os.open(self.description_path, os.O_RDWR | os.O_CREAT | os.O_TRUNC)
+        # if not os.path.exists(self.description_path):
+        #     os.close(fd)
+        #     print("Error: Image: Description: file not created")
+        #     return False
+        #
+        # print(description)
+        # os.write(fd, description)
+        #
+        # os.close(fd)
+        return True
+
 
 
 def get_user_data(user_id):
@@ -72,7 +130,8 @@ def get_user_data(user_id):
     if user_id not in entries:
         return None
     user = UserData()
-    user.load_user_data(os.path.normpath(os.path.abspath(global_working_directory + '/' + user_id)))
+    path = os.path.normpath(os.path.abspath(global_working_directory + '/' + user_id))
+    user.load_user_data(path)
     return user
 
 def upload_user_image(user_id, image_data):
