@@ -20,7 +20,7 @@
                 <div class="photo-wrap">
                     <div class="origin-photo">
                         <div class="img-text">Оригинал</div>
-                        <img :src="originImgPath" v-if="originImgPath" class="img-photo"/>
+                        <img :src="originImgPath"  :key='originImgPath' v-if="originImgPath" class="img-photo"/>
                         <v-progress-circular
                                 v-if="!originImgPath"
                                 :size="70"
@@ -33,7 +33,7 @@
 
                     <div class="future-photo">
                         <div class="img-text">Результат</div>
-                        <img :src="resultImgPath" v-if="originImgPath" class="img-photo"/>
+                        <img :src="resultImgPath" :key='resultImgPath' v-if="resultImgPath" class="img-photo"/>
                         <v-progress-circular
                                 v-if="!resultImgPath"
                                 :size="70"
@@ -105,38 +105,50 @@
         originImgPath: '',
         resultImgPath: '',
         timerId: null,
+        count:0,
         filters: []
       };
     },
     methods: {
       ...mapMutations(['changeLoaderStatus']),
       filterChange: async function () {
-        if (this.$store.state.loader) {
+        if (this.$store.state.loader.status) {
           return;
         }
         if (this.timerId) {
           clearTimeout(this.timerId);
         }
         this.timerId = setTimeout(async () => {
-          this.changeLoaderStatus(true);
-          const filters = this.filters.filter(filter => filter.activate).map(filter => filter.id).join('&');
+          this.changeLoaderStatus({status: true});
+          const filters = this.filters.filter(filter => filter.activate).map(filter => filter.id);
           try {
-            const res = await apiHost.get(`/use-filters?${filters}`);
+            const formData = new FormData();
+            formData.append('params', JSON.stringify({
+              filters,
+              user_id: localStorage.getItem('memHackUserId')
+            }));
+            const res = await apiHost.post(`/use-filters`, formData);
             const isSuccess = res.is_success;
             if (!isSuccess) {
-              this.changeLoaderStatus(false);
+              this.changeLoaderStatus({status: false});
               return showErrors(res.errors);
             }
+            this.count++;
 
-            this.resultImgPath = res.content;
+            this.resultImgPath = `${getUrl(res.content.file_path)}?counter=${this.count}`;
+            this.changeLoaderStatus({
+              status: false,
+              message: ''
+            });
           } catch (e) {
-            this.changeLoaderStatus(false);
+            console.error(e);
+            this.changeLoaderStatus({status: false});
             showNotify({
               text: 'Произошла ошибка',
               type: 'error'
             })
           }
-        }, 1000);
+        }, 1500);
       }
     }
   }

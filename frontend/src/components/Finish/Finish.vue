@@ -2,9 +2,9 @@
     <v-layout row>
         <v-flex xs4 offset-sm4>
             <v-card>
-                <v-img :src="imgPath"/>
+                <v-img id="img" :src="imgPath"/>
                 <v-card-actions>
-                    <v-btn color="indigo" outline>Скачать</v-btn>
+                    <v-btn color="indigo" outline @click="download">Скачать</v-btn>
                     <v-spacer></v-spacer>
                     <social-sharing :url="imgPath" inline-template>
                         <div>
@@ -38,18 +38,20 @@
   import showNotify from 'src/helpers/showNotify';
   import showErrors from 'src/helpers/showErrors';
   import { apiHost } from 'src/api/api.utils';
+  import { saveAs } from 'file-saver';
+  import getUrl from 'src/helpers/getUrl';
 
   export default {
     name: 'Finish',
     async beforeCreate() {
       const params = {'user_id': localStorage.getItem('memHackUserId')};
       try {
-        const res = await apiHost.get('/get-filtered-file ', params);
+        const res = await apiHost.get('/get-original-file', params);
         const isSuccess = res.is_success;
         if (!isSuccess) {
           return showErrors(res.errors);
         }
-        this.imgPath = res.content;
+        this.imgPath = getUrl(res.content.file_path);
       } catch (e) {
         showNotify({
           text: 'Произошла ошибка',
@@ -60,6 +62,15 @@
     data() {
       return {
         imgPath: 'https://i.ytimg.com/vi/bgxFHfNZID0/maxresdefault.jpg'
+      }
+    },
+    methods: {
+      download: function () {
+        try {
+          saveAs(this.imgPath);
+        } catch (e) {
+          console.error(e)
+        }
       }
     }
   }

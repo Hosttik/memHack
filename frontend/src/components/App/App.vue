@@ -1,7 +1,8 @@
 <template>
     <div id="app">
         <v-app>
-            <div class="overlay" v-if="$store.state.loader">
+            <div class="overlay" v-if="$store.state.loader.status">
+                <h2 class="loader-text">{{$store.state.loader.message}}</h2>
                 <v-progress-circular
                         :size="70"
                         :width="7"
@@ -79,6 +80,11 @@
 </script>
 
 <style scoped>
+    .loader-text {
+        color: white;
+        position: absolute;
+        top: 40%;
+    }
     .overlay {
         background: rgba(0, 0, 0, 0.4);
         width: 100%;
